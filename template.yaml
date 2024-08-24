@@ -6,7 +6,7 @@ Transform:
 - AWS::Serverless-2016-10-31
 
 Resources:
-  getAllItemsFunction:
+  getAllItems:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/get-all-items.getAllItemsHandler
@@ -14,25 +14,22 @@ Resources:
       Architectures:
         - x86_64
       MemorySize: 128
-      Timeout: 100
-      Description: A simple example includes a HTTP get method to get all items from a DynamoDB table.
+      Timeout: 15
+      Description: Get all tasks from the DynamoDB table.
       Policies:
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
         - DynamoDBCrudPolicy:
-            TableName: !Ref SampleTable
+            TableName: !Ref Task
       Environment:
         Variables:
-          # Make table name accessible as environment variable from function code during execution
-          SAMPLE_TABLE: !Ref SampleTable
+          TASK_TABLE: !Ref Task
       Events:
         Api:
           Type: Api
           Properties:
-            Path: /
+            Path: /tasks
             Method: GET
 
-  # This is a Lambda function config associated with the source code: get-by-id.js
-  getByIdFunction:
+  getById:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/get-by-id.getByIdHandler
@@ -40,24 +37,22 @@ Resources:
       Architectures:
         - x86_64
       MemorySize: 128
-      Timeout: 100
-      Description: A simple example includes a HTTP get method to get one item by id from a DynamoDB table.
+      Timeout: 5
+      Description: Get one task by id from the DynamoDB table.
       Policies:
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
         - DynamoDBCrudPolicy:
-            TableName: !Ref SampleTable
+            TableName: !Ref Task
       Environment:
         Variables:
-          # Make table name accessible as environment variable from function code during execution
-          SAMPLE_TABLE: !Ref SampleTable
+          TASK_TABLE: !Ref Task
       Events:
         Api:
           Type: Api
           Properties:
-            Path: /{id}
+            Path: /tasks/{id}
             Method: GET
 
-  createTaskFunction:
+  createTask:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/create-task.createTaskHandler
@@ -65,14 +60,14 @@ Resources:
       Architectures:
         - x86_64
       MemorySize: 128
-      Timeout: 100
-      Description: A Lambda function to create a new task in the DynamoDB table.
+      Timeout: 5
+      Description: Create a new task in the DynamoDB table.
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref SampleTable
+            TableName: !Ref Task
       Environment:
         Variables:
-          SAMPLE_TABLE: !Ref SampleTable
+          TASK_TABLE: !Ref Task
       Events:
         Api:
           Type: Api
@@ -80,8 +75,7 @@ Resources:
             Path: /tasks
             Method: POST
 
-  # This is a Lambda function config associated with the source code: put-item.js
-  putItemFunction:
+  putItem:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/put-item.putItemHandler
@@ -89,25 +83,22 @@ Resources:
       Architectures:
         - x86_64
       MemorySize: 128
-      Timeout: 100
-      Description: A simple example includes a HTTP post method to add one item to a DynamoDB table.
+      Timeout: 5
+      Description: Update a task in the DynamoDB table.
       Policies:
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
         - DynamoDBCrudPolicy:
-            TableName: !Ref SampleTable
+            TableName: !Ref Task
       Environment:
         Variables:
-          # Make table name accessible as environment variable from function code during execution
-          SAMPLE_TABLE: !Ref SampleTable
+          TASK_TABLE: !Ref Task
       Events:
         Api:
           Type: Api
           Properties:
-            Path: /
+            Path: /tasks/{id}
             Method: PUT
 
-  # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
-  SampleTable:
+  Task:
     Type: AWS::Serverless::SimpleTable
     Properties:
       PrimaryKey:
