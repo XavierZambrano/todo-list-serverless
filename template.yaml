@@ -5,11 +5,18 @@ Description: >-
 Transform:
 - AWS::Serverless-2016-10-31
 
+Globals:
+    Function:
+        Environment:
+          Variables:
+            TABLE_NAME: !Ref Task
+            ENDPOINT_OVERRIDE: ""
+
 Resources:
-  getAllItems:
+  getAllTasks:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/get-all-items.getAllItemsHandler
+      Handler: src/handlers/get-all-tasks.getAllTasksHandler
       Runtime: nodejs20.x
       Architectures:
         - x86_64
@@ -19,9 +26,6 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref Task
-      Environment:
-        Variables:
-          TASK_TABLE: !Ref Task
       Events:
         Api:
           Type: Api
@@ -29,10 +33,10 @@ Resources:
             Path: /tasks
             Method: GET
 
-  getById:
+  getTaskById:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/get-by-id.getByIdHandler
+      Handler: src/handlers/get-task-by-id.getTaskByIdHandler
       Runtime: nodejs20.x
       Architectures:
         - x86_64
@@ -42,9 +46,6 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref Task
-      Environment:
-        Variables:
-          TASK_TABLE: !Ref Task
       Events:
         Api:
           Type: Api
@@ -65,9 +66,6 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref Task
-      Environment:
-        Variables:
-          TASK_TABLE: !Ref Task
       Events:
         Api:
           Type: Api
@@ -75,10 +73,10 @@ Resources:
             Path: /tasks
             Method: POST
 
-  putItem:
+  updateTask:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/put-item.putItemHandler
+      Handler: src/handlers/update-task.updateTaskHandler
       Runtime: nodejs20.x
       Architectures:
         - x86_64
@@ -88,15 +86,33 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref Task
-      Environment:
-        Variables:
-          TASK_TABLE: !Ref Task
       Events:
         Api:
           Type: Api
           Properties:
             Path: /tasks/{id}
             Method: PUT
+
+  deleteTask:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/delete-task.deleteTaskHandler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 5
+      Description: Delete a task from the DynamoDB table.
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref Task
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /tasks/{id}
+            Method: DELETE
+
 
   Task:
     Type: AWS::Serverless::SimpleTable
