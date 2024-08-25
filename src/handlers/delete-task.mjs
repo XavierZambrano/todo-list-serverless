@@ -23,7 +23,7 @@ export const deleteTaskHandler = async (event) => {
         if (!Item) {
             return {
                 statusCode: 404,
-                body: JSON.stringify({ error: 'Task not found' })
+                body: JSON.stringify({ error: 'Task not exists, please provide a valid id' })
             };
         }
 

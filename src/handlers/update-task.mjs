@@ -1,5 +1,5 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 
 const clientConfig = {}
 if (process.env.ENDPOINT_OVERRIDE) {
@@ -16,21 +16,35 @@ export const updateTaskHandler = async (event) => {
     const content = body.content;
     const completed = body.completed;
 
-    var params = {
-        TableName : tableName,
-        Item: { id, content, completed }
-    };
-
     try {
-        await ddbDocClient.send(new PutCommand(params));
+        const getParams = {
+            TableName: tableName,
+            Key: { id }
+        };
+        const { Item } = await ddbDocClient.send(new GetCommand(getParams));
+
+        if (!Item) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({ error: 'Task not exists, please provide a valid id' })
+            };
+        }
+
+        const putParams = {
+            TableName: tableName,
+            Item: { id, content, completed }
+        };
+
+        await ddbDocClient.send(new PutCommand(putParams));
         return {
             statusCode: 200,
-        };    
-      } catch (err) {
+            body: JSON.stringify(putParams.Item)
+        };
+    } catch (err) {
         console.error("Error", err);
         return {
             statusCode: 500,
             body: JSON.stringify({ error: 'Could not update the task' })
         };
-      }
+    }
 };
