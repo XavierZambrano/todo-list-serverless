@@ -14,7 +14,13 @@ This is a basic example of a serverless application using AWS Lambda, API Gatewa
    ```
    cd todo-list-serverless
    ```
-3. Deploy the application:
+
+3. Install the dependencies:
+   ```
+   npm install
+   ```
+
+4. Deploy the application:
    ```
    sam deploy --guided
    ```
